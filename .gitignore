@@ -1,0 +1,13 @@
+*.class
+target
+.settings
+.idea/
+*.iml
+*/*.iml
+*.project
+*.classpath
+*.log
+build/
+.gradle/
+.idea/uiDesigner.xml
+out/
