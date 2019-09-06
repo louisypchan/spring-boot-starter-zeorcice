@@ -1,0 +1,11 @@
+spring:
+  profiles:
+    include: logging
+
+
+icebox:
+  name: This is a demo
+  services:
+    - name: printDemo
+      entry: com.zd.test.TestService
+      endpoints: tcp -p 20000
