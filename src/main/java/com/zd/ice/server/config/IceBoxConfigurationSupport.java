@@ -1,10 +1,16 @@
 package com.zd.ice.server.config;
 
+import com.zd.ice.server.IceBoxServer;
 import com.zd.ice.server.impl.DefaultServiceManager;
+import com.zeroc.IceBox.Service;
 import org.springframework.beans.BeansException;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
 import org.springframework.lang.Nullable;
 
 /****************************************************************************
@@ -40,9 +46,12 @@ public class IceBoxConfigurationSupport implements ApplicationContextAware {
         return this.applicationContext;
     }
 
-
     @Bean
-    public DefaultServiceManager defaultServiceManager() {
-        return new DefaultServiceManager();
+    @ConditionalOnClass(Service.class)
+    @ConditionalOnMissingBean
+    @Scope("singleton")
+    public IceBoxServer iceBoxServer(ApplicationArguments applicationArguments, IceBoxProperties iceBoxProperties) {
+        return new IceBoxServer(applicationContext, applicationArguments).prepare(iceBoxProperties)
+                .serve();
     }
 }

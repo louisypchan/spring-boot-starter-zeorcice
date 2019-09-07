@@ -35,9 +35,9 @@ public class IceBoxProperties {
 
     /**
      * If num is set to a value larger than zero, each service inherits the configuration properties of the EnableIceBox server's communicator. If not defined,
-     * the default value is zero.
+     * the default value is 1.
      */
-    private String inheritProperties = "0";
+    private String inheritProperties = "1";
     /**
      * Determines the order in which services are loaded. The service manager loads the services in the order they appear in names, where each
      * service name is separated by a comma or white space. Any services not mentioned in names are loaded afterward, in an undefined order.

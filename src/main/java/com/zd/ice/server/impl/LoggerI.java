@@ -1,9 +1,7 @@
-package com.zd.test.config;
+package com.zd.ice.server.impl;
 
-import com.zd.ice.server.anno.EnableIceBox;
-import com.zd.test.repo.TestBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /****************************************************************************
  Copyright (c) 2019 Louis Y P Chen.
@@ -23,14 +21,43 @@ import org.springframework.context.annotation.Configuration;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-@Configuration
-@EnableIceBox
-public class TestConfiguration {
+public class LoggerI implements com.zeroc.Ice.Logger {
 
-    @Bean
-    public TestBean testBean() {
-        TestBean testBean = new TestBean();
-        testBean.setName("Louis");
-        return testBean;
+    private final Logger logger = LoggerFactory.getLogger(LoggerI.class);
+
+    private final String prefix;
+
+    public LoggerI(String prefix) {
+        this.prefix = prefix;
+    }
+
+    @Override
+    public void print(String message) {
+        logger.info(message);
+    }
+
+    @Override
+    public void trace(String category, String message) {
+        logger.debug(String.format("[%s]%s", category, message));
+    }
+
+    @Override
+    public void warning(String message) {
+        logger.warn(message);
+    }
+
+    @Override
+    public void error(String message) {
+        logger.error(message);
+    }
+
+    @Override
+    public String getPrefix() {
+        return this.prefix;
+    }
+
+    @Override
+    public com.zeroc.Ice.Logger cloneWithPrefix(String prefix) {
+        return new LoggerI(prefix);
     }
 }

@@ -3,8 +3,11 @@ package com.zd.ice.server.config;
 import com.zd.ice.server.IceBoxServer;
 import com.zd.ice.server.impl.DefaultServiceManager;
 import com.zeroc.IceBox.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -30,11 +33,4 @@ import org.springframework.context.annotation.Scope;
 @Configuration
 public class DelegatingIceBoxConfiguration extends IceBoxConfigurationSupport{
 
-    @Bean
-    @ConditionalOnClass(Service.class)
-    @ConditionalOnMissingBean
-    @Scope("singleton")
-    public IceBoxServer iceBoxServer(DefaultServiceManager defaultServiceManager, IceBoxProperties iceBoxProperties) {
-        return new IceBoxServer(defaultServiceManager).prepare(iceBoxProperties);
-    }
 }

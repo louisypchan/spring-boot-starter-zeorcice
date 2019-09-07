@@ -2,11 +2,14 @@ package com.zd.ice.server;
 
 import com.zd.ice.server.config.IceBoxProperties;
 import com.zd.ice.server.impl.DefaultServiceManager;
+import com.zd.ice.server.impl.LoggerI;
 import com.zd.ice.server.util.Ice;
 import com.zeroc.Ice.Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
 
 import java.util.Map;
@@ -43,15 +46,18 @@ public class IceBoxServer extends com.zeroc.Ice.Application{
     private final static String DefaultMessageSizeMax = "1024"; //KB
 
 
-    private final DefaultServiceManager defaultServiceManager;
+    private DefaultServiceManager defaultServiceManager;
+    private final ApplicationArguments applicationArguments;
+    private final ApplicationContext applicationContext;
 
     private com.zeroc.Ice.InitializationData initData = null;
 
     private String instanceName = null;
 
-    public IceBoxServer(DefaultServiceManager defaultServiceManager) {
+    public IceBoxServer(ApplicationContext applicationContext, ApplicationArguments applicationArguments) {
         this.initData = new com.zeroc.Ice.InitializationData();
-        this.defaultServiceManager = defaultServiceManager;
+        this.applicationContext = applicationContext;
+        this.applicationArguments = applicationArguments;
     }
 
     private void buildDefault(Properties properties) {
@@ -71,6 +77,8 @@ public class IceBoxServer extends com.zeroc.Ice.Application{
 
     public IceBoxServer prepare(IceBoxProperties iceBoxProperties) {
         logger.info("prepare icebox according to properties");
+        //use customer logger
+        com.zeroc.Ice.Util.setProcessLogger(new LoggerI("spring-boot-starter-zeorcice by louisypchan"));
         initData.properties = com.zeroc.Ice.Util.createProperties();
         this.buildDefault(initData.properties);
         if (StringUtils.isNotBlank(iceBoxProperties.getPrintServicesReady())){
@@ -116,9 +124,15 @@ public class IceBoxServer extends com.zeroc.Ice.Application{
         return this;
     }
 
+    public IceBoxServer serve() {
+        System.exit(this.main(this.instanceName, this.applicationArguments.getSourceArgs(), this.initData));
+        return this;
+    }
+
     @Override
     public int run(String[] args) {
         logger.info("start to initiate icebox server");
-        return 0;
+        this.defaultServiceManager = new DefaultServiceManager(applicationContext, communicator(), applicationArguments.getSourceArgs());
+        return this.defaultServiceManager.run();
     }
 }
