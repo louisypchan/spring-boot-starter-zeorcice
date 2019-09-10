@@ -5,8 +5,8 @@ plugins {
 
 ext['iceVersion'] = '3.7.2'
 
-group 'com.zd'
-version '1.0'
+group 'com.github.louisypchan'
+version '0.1'
 
 sourceCompatibility = 1.8
 
@@ -20,6 +20,10 @@ repositories {
         url "https://plugins.gradle.org/m2/"
     }
     mavenCentral()
+}
+
+jar {
+    enabled = true
 }
 
 configurations {
