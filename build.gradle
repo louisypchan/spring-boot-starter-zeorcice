@@ -1,9 +1,9 @@
 plugins {
     id 'java'
-    id "org.springframework.boot" version "2.1.6.RELEASE"
+    id "org.springframework.boot" version "2.2.5.RELEASE"
 }
 
-ext['iceVersion'] = '3.7.2'
+ext['iceVersion'] = '3.7.3'
 
 group 'com.github.louisypchan'
 version '0.1'

@@ -78,7 +78,7 @@ public class IceBoxServer extends com.zeroc.Ice.Application{
     public IceBoxServer prepare(IceBoxProperties iceBoxProperties) {
         logger.info("prepare icebox according to properties");
         //use customer logger
-        com.zeroc.Ice.Util.setProcessLogger(new LoggerI("spring-boot-starter-zeorcice by louisypchan"));
+        com.zeroc.Ice.Util.setProcessLogger(new LoggerI("spring-boot-starter-zerocice by louisypchan"));
         initData.properties = com.zeroc.Ice.Util.createProperties();
         this.buildDefault(initData.properties);
         if (StringUtils.isNotBlank(iceBoxProperties.getPrintServicesReady())){
@@ -94,6 +94,21 @@ public class IceBoxServer extends com.zeroc.Ice.Application{
                 String entry = service.getEntry();
                 String endpoints = service.getEndpoints();
                 if (StringUtils.isNotBlank(entry)){
+                    if (StringUtils.isNotBlank(service.getName())){
+                        initData.properties.setProperty(String.format("IceBox.Service.%s", service.getName()), entry);
+                    } else {
+                        try {
+                            Class<?> clz = Class.forName(entry);
+                            // get interface's name
+                            Class<?> interfaces[] = clz.getInterfaces();
+                            if (interfaces.length > 0) {
+//                                initData.properties.setProperty(String.format("IceBox.Service.%sPrx", interfaces[0].getName()), entry);
+                                service.setName(String.format("%sPrx", interfaces[0].getName()));
+                            }
+                        }catch (Exception e) {
+                            logger.error("set up service error: ", e);
+                        }
+                    }
                     initData.properties.setProperty(String.format("IceBox.Service.%s", service.getName()), entry);
                 }
                 if(StringUtils.isNotBlank(endpoints)){
