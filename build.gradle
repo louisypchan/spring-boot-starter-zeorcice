@@ -6,7 +6,7 @@ plugins {
 ext['iceVersion'] = '3.7.3'
 
 group 'com.github.louisypchan'
-version '0.1'
+version '0.5'
 
 sourceCompatibility = 1.8
 

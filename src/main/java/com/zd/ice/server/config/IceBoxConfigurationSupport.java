@@ -51,7 +51,6 @@ public class IceBoxConfigurationSupport implements ApplicationContextAware {
     @ConditionalOnMissingBean
     @Scope("singleton")
     public IceBoxServer iceBoxServer(ApplicationArguments applicationArguments, IceBoxProperties iceBoxProperties) {
-        return new IceBoxServer(applicationContext, applicationArguments).prepare(iceBoxProperties)
-                .serve();
+        return new IceBoxServer(applicationContext, applicationArguments).prepare(iceBoxProperties);
     }
 }

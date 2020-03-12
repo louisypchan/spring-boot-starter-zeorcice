@@ -44,6 +44,9 @@ public class IceBoxProperties {
      */
     private String loadOrder;
 
+    // for unit test purpose
+    // set true will not make icebox server
+    private boolean unitTest = false;
 
     /**
      * Miscellaneous from ice
@@ -99,6 +102,14 @@ public class IceBoxProperties {
 
     public void setServices(List<Service> services) {
         this.services = services;
+    }
+
+    public boolean isUnitTest() {
+        return unitTest;
+    }
+
+    public void setUnitTest(boolean unitTest) {
+        this.unitTest = unitTest;
     }
 
     public static class Service {

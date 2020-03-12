@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.util.Assert;
 
 import java.util.Map;
@@ -32,7 +34,7 @@ import java.util.Map;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-public class IceBoxServer extends com.zeroc.Ice.Application{
+public class IceBoxServer extends com.zeroc.Ice.Application implements ApplicationListener<ContextRefreshedEvent> {
 
     private final Logger logger = LoggerFactory.getLogger(IceBoxServer.class);
 
@@ -54,10 +56,23 @@ public class IceBoxServer extends com.zeroc.Ice.Application{
 
     private String instanceName = null;
 
+    private boolean running = false;
+    private boolean served = false;
+
+    private IceBoxProperties iceBoxProperties;
+
     public IceBoxServer(ApplicationContext applicationContext, ApplicationArguments applicationArguments) {
         this.initData = new com.zeroc.Ice.InitializationData();
         this.applicationContext = applicationContext;
         this.applicationArguments = applicationArguments;
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (running) {
+                running = false;
+                served = false;
+                this.defaultServiceManager.shutdown(null);
+            }
+        }));
     }
 
     private void buildDefault(Properties properties) {
@@ -77,6 +92,7 @@ public class IceBoxServer extends com.zeroc.Ice.Application{
 
     public IceBoxServer prepare(IceBoxProperties iceBoxProperties) {
         logger.info("prepare icebox according to properties");
+        this.iceBoxProperties = iceBoxProperties;
         //use customer logger
         com.zeroc.Ice.Util.setProcessLogger(new LoggerI("spring-boot-starter-zerocice by louisypchan"));
         initData.properties = com.zeroc.Ice.Util.createProperties();
@@ -139,15 +155,27 @@ public class IceBoxServer extends com.zeroc.Ice.Application{
         return this;
     }
 
-    public IceBoxServer serve() {
+    public void serve() {
+        served = true;
         System.exit(this.main(this.instanceName, this.applicationArguments.getSourceArgs(), this.initData));
-        return this;
     }
 
     @Override
     public int run(String[] args) {
         logger.info("start to initiate icebox server");
         this.defaultServiceManager = new DefaultServiceManager(applicationContext, communicator(), applicationArguments.getSourceArgs());
+        running = true;
         return this.defaultServiceManager.run();
+    }
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        if (!served) {
+            if (this.iceBoxProperties.isUnitTest()) {
+                logger.info("Louis: Not necessary to start server for unit test");
+            } else {
+                serve();
+            }
+        }
     }
 }
